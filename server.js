@@ -51,16 +51,16 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // Routes
-app.use('/api/hospitals', hospitalRoutes);
-app.use('/api/Sage_femmes', midwifeRoutes);
-app.use('/api/patientes', patientesRoutes);
-app.use('/api/Rendez_Vous', appointmentRoutes);
-app.use('/api/consultations', consultationRoutes);
-app.use('/api/taches', taskRoutes);
-//app.use('/api/statistics', statisticRoutes);
-//app.use('/api/notifications', notificationRoutes);
-//app.use('/api/resources', resourceRoutes);
-//app.use('/api/histories', historyRoutes);
+app.use('/hospitals', hospitalRoutes);
+app.use('/Sage_femmes', midwifeRoutes);
+app.use('/patientes', patientesRoutes);
+app.use('/Rendez_Vous', appointmentRoutes);
+app.use('/consultations', consultationRoutes);
+app.use('/taches', taskRoutes);
+//app.use('/statistics', statisticRoutes);
+//app.use('/notifications', notificationRoutes);
+//app.use('/resources', resourceRoutes);
+//app.use('/histories', historyRoutes);
 
 
 

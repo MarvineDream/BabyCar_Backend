@@ -7,6 +7,10 @@ export const createAppointment = async (req, res) => {
     try {
         const appointment = new Appointment(req.body);
         await appointment.save();
+
+
+        await sendSmsNotification(appointment.patient.phone,
+    appointment.date);
         res.status(201).send(appointment);
     } catch (error) {
         res.status(400).send(error);
