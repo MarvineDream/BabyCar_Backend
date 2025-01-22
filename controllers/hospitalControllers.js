@@ -15,8 +15,8 @@ const validateHospital = [
     body('address').isString().notEmpty().withMessage('L\'adresse est requise.'),
     body('contact').isString().notEmpty().withMessage('Le contact est requis.'),
     body('email').isString().notEmpty().withMessage('L\'email est requis.'),
-    body('latitude').isNumeric().notEmpty().withMessage('La latitude est requise.'),
-    body('longitude').isNumeric().notEmpty().withMessage('La longitude est requise.'),
+    //body('latitude').isNumeric().notEmpty().withMessage('La latitude est requise.'),
+    //body('longitude').isNumeric().notEmpty().withMessage('La longitude est requise.'),
 ];
 
 
@@ -43,7 +43,9 @@ const createHospital = async (req, res) => {
             to: req.body.contactEmail,
             subject: 'Confirmation de la création de l\'hôpital',
             text: `L'hôpital ${hospital.name} a été créé avec succès !`,
+            
         };
+        console.log(mailOptions);
 
         await transporter.sendMail(mailOptions);
 
