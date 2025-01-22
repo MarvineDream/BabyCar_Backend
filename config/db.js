@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -16,3 +17,14 @@ export const connectToDatabase = async () => {
         console.error('Erreur de connexion à MongoDB:', error);
     }
 };
+
+
+ const transporter = nodemailer.createTransport({
+    service: 'gmail', 
+    auth: {
+        user: process.env.user, 
+        pass: process.env.pass
+    }
+});
+
+export default transporter; 

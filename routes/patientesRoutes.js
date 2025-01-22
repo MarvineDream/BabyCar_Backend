@@ -6,6 +6,6 @@ const router = express.Router({ mergeParams: true });
 
 // Route pour créer une patiente avec l'Id de la sage femme qui le fait.
 router.post('/:midwifeId', createPatient);
-router.get('/', getPatients);
+router.get('/:midwifeId', getPatients);
 
 export default router;

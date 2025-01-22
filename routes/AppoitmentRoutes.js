@@ -4,7 +4,7 @@ import { createAppointment, deleteAppointment, getAppointmentById, getAppointmen
 
 const router = express.Router();
 
-router.post('/', createAppointment);
+router.post('/:midwifeId', createAppointment);
 router.get('/', getAppointments);
 router.get('/:id', getAppointmentById);
 router.put('/:id', updateAppointment);

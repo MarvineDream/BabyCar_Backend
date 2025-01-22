@@ -1,4 +1,6 @@
 import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import { connectToDatabase } from './config/db.js';
 import hospitalRoutes from './routes/hospitalRoutes.js';
@@ -9,6 +11,9 @@ import consultationRoutes from './routes/consultationRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import rechercheRoutes from './routes/rechercheRoutes.js';
+import StatistiquesRoutes from './routes/StatistiquesRoutes.js';
+import VisitoRdvRoutes from './routes/visitoRdvRoutes.js';
 
 
 
@@ -55,12 +60,33 @@ app.use('/hospitals', hospitalRoutes);
 app.use('/Sage_femmes', midwifeRoutes);
 app.use('/patientes', patientesRoutes);
 app.use('/Rendez_Vous', appointmentRoutes);
+app.use('/rendez_vous_visiteur', VisitoRdvRoutes);
 app.use('/consultations', consultationRoutes);
 app.use('/taches', taskRoutes);
-//app.use('/statistics', statisticRoutes);
+app.use('/Recherche', rechercheRoutes);
+app.use('/statistiques', StatistiquesRoutes);
 //app.use('/notifications', notificationRoutes);
 //app.use('/resources', resourceRoutes);
 //app.use('/histories', historyRoutes);
+
+
+
+
+
+const server = http.createServer(app);
+const io = new Server(server);
+
+
+
+io.on('connection', (socket) => {
+    console.log('Un utilisateur est connecté');
+
+    // Émettez des statistiques en temps réel
+    setInterval(async () => {
+        const statistics = await statistique.find();
+        socket.emit('updateStatistics', statistics);
+    }, 5000); // Émettez toutes les 5 secondes
+});
 
 
 

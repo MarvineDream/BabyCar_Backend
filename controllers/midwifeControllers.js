@@ -1,9 +1,10 @@
 import Midwife from '../models/Midwife.js';
+import transporter from '../config/db.js';
 
 
 
 
-export const createMidwife = async (name, hospitalId) => {
+export const createMidwife = async (name, hospitalId, email) => {
   const newMidwife = new Midwife({ name, hospital: hospitalId });
   await newMidwife.save();
 
@@ -12,8 +13,21 @@ export const createMidwife = async (name, hospitalId) => {
   hospital.midwives.push(newMidwife._id);
   await hospital.save();
 
+  
+  const mailOptions = {
+      from: '',
+      to: email, 
+      subject: 'Confirmation de votre inscription en tant que sage-femme',
+      text: `Bonjour ${name},\n\nVotre inscription en tant que sage-femme a été réussie ! Voici vos informations de connexion :\n\nNom: ${name}\nHôpital: ${hospital.name}\n\nMerci de votre confiance !`,
+  };
+
+  await transporter.sendMail(mailOptions);
+
   return newMidwife;
 };
+
+
+
 
 
 export const getMidwives = async (req, res) => {

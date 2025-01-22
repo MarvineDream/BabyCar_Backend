@@ -17,6 +17,7 @@ export const getStatistics = async (req, res) => {
             .populate('consultations')
             .populate('midwife')
             .populate('patient');
+        
         res.send(statistics);
     } catch (error) {
         res.status(500).send(error);

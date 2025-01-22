@@ -4,7 +4,10 @@ const hospitalSchema = new mongoose.Schema({
   name: { type: String, required: true},
   address: { type: String, required: true},
   contact: { type: String, required: true},
-  midwives: [{type: mongoose.Schema.Types.ObjectId,ref: 'Midwife'}]
+  email: { type: String, required: true},
+  midwives: [{type: mongoose.Schema.Types.ObjectId,ref: 'Midwife'}],
+  latitude: { type: Number, required: true },
+  longitude: { type: Number, required: true },
 },
 { timestamps: true });
 
