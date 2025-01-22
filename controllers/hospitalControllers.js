@@ -34,16 +34,28 @@ const createHospital = async (req, res) => {
     }
 
     try {
+        // Vérifier l'unicité de l'email et du numéro de téléphone
+        const existingHospital = await Hospital.findOne({
+            $or: [
+                { email: req.body.email },
+                { phone: req.body.phone }
+            ]
+        });
+
+        if (existingHospital) {
+            return res.status(400).json({ 
+                message: 'Un hôpital avec cette adresse e-mail ou ce numéro de téléphone existe déjà.' 
+            });
+        }
+
         const hospital = new Hospital(req.body);
         await hospital.save();
 
-        
         const mailOptions = {
             from: process.env.user,
             to: req.body.email,
             subject: 'Confirmation de la création de l\'hôpital',
             text: `L'hôpital ${hospital.name} a été créé avec succès !`,
-            
         };
         console.log(mailOptions);
 

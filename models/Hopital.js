@@ -6,8 +6,8 @@ const hospitalSchema = new mongoose.Schema({
   contact: { type: String, required: true},
   email: { type: String, required: true},
   midwives: [{type: mongoose.Schema.Types.ObjectId,ref: 'Midwife'}],
-  latitude: { type: Number, required: false },
-  longitude: { type: Number, required: false },
+  //latitude: { type: Number, required: false },
+  //longitude: { type: Number, required: false },
 },
 { timestamps: true });
 
