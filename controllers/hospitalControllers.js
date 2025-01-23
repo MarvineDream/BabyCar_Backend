@@ -52,7 +52,7 @@ const createHospital = async (req, res) => {
         await hospital.save();
 
         const mailOptions = {
-            from: process.env.user,
+            from: process.env.EMAIL_USER,
             to: req.body.email,
             subject: 'Confirmation de la création de l\'hôpital',
             text: `L'hôpital ${hospital.name} a été créé avec succès !`,
