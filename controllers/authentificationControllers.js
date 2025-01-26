@@ -3,6 +3,7 @@ import { body, validationResult } from 'express-validator';
 import dotenv from 'dotenv';
 import transporter from '../config/db.js';
 import bcrypt from 'bcrypt';
+
 import { generateToken } from '../middleware/jwt.js';
 
 dotenv.config();
@@ -15,7 +16,6 @@ const validateHospital = [
     body('email').isString().notEmpty().withMessage('L\'email est requis.'),
 ];
 
-
 const createHospital = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -25,37 +25,43 @@ const createHospital = async (req, res) => {
         });
     }
 
-    // Vérifiez que le mot de passe est fourni
-    if (!req.body.password) {
-        return res.status(400).json({ 
-            message: 'Le mot de passe est requis.' 
-        });
-    }
-
     try {
+        const existingHospital = await Hospital.findOne({
+            $or: [
+                { email: req.body.email },
+                { phone: req.body.phone }
+            ]
+        });
+
+        if (existingHospital) {
+            return res.status(400).json({ 
+                message: 'Un hôpital avec cette adresse e-mail ou ce numéro de téléphone existe déjà.' 
+            });
+        }
+
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const hospitalData = { ...req.body, password: hashedPassword }; 
 
         const hospital = new Hospital(hospitalData);
         await hospital.save();
 
+        const token = generateToken(hospital); 
+
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: req.body.email,
             subject: 'Confirmation de la création de l\'hôpital',
-            text: `L'hôpital ${hospital.name} a été créé avec succès !\n\nVoici vos éléments de connexion :\nEmail : ${req.body.email}\nMot de passe : ${req.body.password}`,
+            text: `L'hôpital ${hospital.name} a été créé avec succès\n\nVoici vos éléments de connexion:\nEmail:${req.body.email}\nMot de passe:${req.body.password}`,
         };
         console.log(mailOptions);
 
         await transporter.sendMail(mailOptions);
 
-        res.status(201).json({ hospital }); // Renvoie l'hôpital
+        res.status(201).json({ hospital, token }); // Renvoie l'hôpital et le token
     } catch (error) {
         res.status(500).json({ message: 'Erreur lors de la création de l\'hôpital.', error: error.message });
     }
 };
-
-
 
 // Fonction de connexion pour générer un token
 const loginHospital = async (req, res) => {

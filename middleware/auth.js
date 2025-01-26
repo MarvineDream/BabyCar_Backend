@@ -1,29 +1,31 @@
 import jwt from 'jsonwebtoken';
+import Admin from '../models/Admin.js';
+import dotenv from 'dotenv';
 
-export const authenticate = async (req, res, next) => {
-    const token = req.headers['authorization']?.split(' ')[1];
-    console.log(token);
-    
+
+
+
+dotenv.config();
+
+const secret = process.env.JWT_SECRET;
+
+export const authenticate = (req, res, next) => {
+    const token = req.headers.authorization;
 
     if (!token) {
-        return res.status(401).json({ message: 'Accès refusé. Token manquant.' });
+        return res.status(401).send('Token is required');
     }
 
-    try {
-        const decoded = jwt.verify(token, 'votre_clé_secrète');
-        const admin = await Admin.findById(decoded.id).select('-password');
-
-        if (!admin) {
-            return res.status(401).json({ message: 'Accès refusé. Admin non trouvé.' });
+    console.log('Secret:', secret); 
+    jwt.verify(token, secret, (err, decoded) => {
+        if (err) {
+            return res.status(403).send('Invalid token');
         }
-
-        req.admin = admin; // Attacher l'objet admin à la requête
+        req.user = decoded; 
         next();
-    } catch (error) {
-        console.error(error);
-        res.status(400).json({ message: 'Token invalide.' });
-    }
+    });
 };
+
 
 export const authorize = (roles) => {
     return (req, res, next) => {

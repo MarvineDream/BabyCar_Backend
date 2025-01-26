@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/', createHospital);
 
 // Route pour récupérer tous les hôpitaux : accessible uniquement à l'admin root
-router.get('/', authenticate, authorize(['root']), getHospitals);
+router.get('/', getHospitals);
 
 // Route pour récupérer un hôpital par son ID : accessible uniquement à l'admin root
 router.get('/:id', authenticate, authorize(['root']), getHospitalById);
