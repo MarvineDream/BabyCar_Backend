@@ -2,10 +2,21 @@ import Hospital from '../models/Hopital.js';
 import { body, validationResult } from 'express-validator';
 import dotenv from 'dotenv';
 import transporter from '../config/db.js';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import { generateToken } from '../middleware/jwt.js';
+
 
 dotenv.config();
+
+
+
+export const generateToken = (hospital) => {
+    return jwt.sign(
+        { id: hospital._id, email: hospital.email },
+        process.env.JWT_SECRET, 
+        { expiresIn: '1h' } 
+    );
+};
 
 const validateHospital = [
     body('name').isString().notEmpty().withMessage('Le nom est requis.'),
@@ -72,8 +83,8 @@ const loginHospital = async (req, res) => {
             return res.status(401).json({ message: 'Mot de passe incorrect.' });
         }
 
-        const token = generateToken(hospital); // Générer le token
-        res.json({ hospital, token }); // Renvoie l'hôpital et le token
+        generateToken(hospital);
+        res.json({ hospital, token }); 
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

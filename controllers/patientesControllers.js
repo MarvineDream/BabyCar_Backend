@@ -2,9 +2,13 @@ import Patientes from '../models/Patientes.js';
 import dotenv from 'dotenv';
 import transporter from '../config/db.js';
 import bcrypt from 'bcrypt';
+import { generateToken } from './hospitalControllers.js';
 
 
 dotenv.config();
+
+
+
 
 
 
@@ -60,6 +64,32 @@ export const createPatient = async (req, res) => {
         res.status(400).send({ message: error.message });
     }
 };
+
+
+
+
+const loginPatient = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const hospital = await hospital.findOne({ email });
+        if (!hospital) {
+            return res.status(404).json({ message: 'Hôpital non trouvé.' });
+        }
+
+        const isMatch = await bcrypt.compare(password, hospital.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: 'Mot de passe incorrect.' });
+        }
+
+        generateToken(hospital); 
+        res.json({ hospital, token }); 
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export { loginPatient };
 
 
 

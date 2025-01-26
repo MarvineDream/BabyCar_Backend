@@ -23,7 +23,7 @@ export const login = async (req, res) => {
     try {
         const admin = await Admin.findOne({ adminName });
         if (admin && await bcrypt.compare(password, admin.password)) {
-            const token = generateToken(admin._id);
+            generateToken(admin._id);
             res.status(200).json({ token, admin });
         } else {
             res.status(401).json({ message: 'Identifiants invalides' });

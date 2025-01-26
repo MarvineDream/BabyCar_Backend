@@ -6,18 +6,18 @@ const router = express.Router();
 
 
 // Route pour créer un patient : accessible aux sages-femmes
-router.post('/', authenticate, authorize(['sage-femme']), createPatient);
+router.post('/:midwifeId', createPatient);
 
-// Route pour récupérer tous les patients : accessible aux sages-femmes et a l'admin de l'hopital
-router.get('/', authenticate, authorize(['sage-femme', 'hospitalAdmin']), getPatients);
+// Route pour récupérer tous les patients : accessible aux sages-femmes
+router.get('/', authenticate, getPatients);
 
 // Route pour récupérer un patient par ID : accessible aux sages-femmes et a l'admin de l'hopital
-router.get('/:id', authenticate, authorize(['sage-femme', 'hospitalAdmin']), getPatientById);
+router.get('/:id', getPatientById);
 
 // Route pour mettre à jour un patient : accessible aux sages-femmes et a l'admin de l'hopital
-router.put('/:id', authenticate, authorize(['sage-femme', 'hospitalAdmin']), updatePatient);
+router.put('/:id', updatePatient);
 
 // Route pour supprimer un patient : accessible aux sages-femmes et a l'admin de l'hopital
-router.delete('/:id', authenticate, authorize(['sage-femme', 'hospitalAdmin']), deletePatient);
+router.delete('/:id', deletePatient);
 
 export default router;
