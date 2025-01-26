@@ -1,6 +1,6 @@
 import Statistic from '../models/Statistic.js';
 
-export const createStatistic = async (req, res) => {
+/*export const createStatistic = async (req, res) => {
     try {
         const statistic = new Statistic(req.body);
         await statistic.save();
@@ -8,7 +8,7 @@ export const createStatistic = async (req, res) => {
     } catch (error) {
         res.status(400).send(error);
     }
-};
+}; */
 
 export const getStatistics = async (req, res) => {
     try {
@@ -17,12 +17,19 @@ export const getStatistics = async (req, res) => {
             .populate('consultations')
             .populate('midwife')
             .populate('patient');
-        
-        res.send(statistics);
+
+        // Vérification si des statistiques ont été trouvées
+        if (!statistics.length) {
+            return res.status(404).send({ message: 'Aucune statistique trouvée.' });
+        }
+
+        res.status(200).send(statistics);
     } catch (error) {
-        res.status(500).send(error);
+        console.error('Erreur lors de la récupération des statistiques:', error);
+        res.status(500).send({ message: 'Erreur interne du serveur.', error });
     }
 };
+
 
 export const getStatisticById = async (req, res) => {
     try {

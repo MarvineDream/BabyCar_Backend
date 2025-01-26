@@ -14,6 +14,8 @@ import cors from 'cors';
 import rechercheRoutes from './routes/rechercheRoutes.js';
 import StatistiquesRoutes from './routes/StatistiquesRoutes.js';
 import VisitoRdvRoutes from './routes/visitoRdvRoutes.js';
+import authentificationRoutes from './routes/authentificationRoutes.js';
+import { getStatistics } from './controllers/statistiControllers.js';
 
 
 
@@ -56,6 +58,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // Routes
+app.use('/Authentification', authentificationRoutes);
 app.use('/hospitals', hospitalRoutes);
 app.use('/Sage_femmes', midwifeRoutes);
 app.use('/patientes', patientesRoutes);
@@ -78,15 +81,38 @@ const io = new Server(server);
 
 
 
+
+// Gestionnaire de connexion Socket.IO
 io.on('connection', (socket) => {
     console.log('Un utilisateur est connecté');
 
-    // Émettez des statistiques en temps réel
-    setInterval(async () => {
-        const statistics = await statistique.find();
-        socket.emit('updateStatistics', statistics);
-    }, 5000); // Émettez toutes les 5 secondes
+    const intervalId = setInterval(async () => {
+        try {
+            const req = {}; 
+            const res = {
+                send: (data) => {
+                    socket.emit('updateStatistics', data);
+                },
+                status: (code) => ({
+                    send: (data) => {
+                        console.error(`Erreur ${code}:`, data);
+                    }
+                })
+            };
+
+            // Appel de la fonction getStatistics
+            await getStatistics(req, res);
+        } catch (error) {
+            console.error('Erreur lors de la récupération des statistiques:', error);
+        }
+    }, 5000); 
+
+    socket.on('disconnect', () => {
+        console.log('Un utilisateur est déconnecté');
+        clearInterval(intervalId); // Arrêt de l'intervalle lors de la déconnexion
+    });
 });
+
 
 
 

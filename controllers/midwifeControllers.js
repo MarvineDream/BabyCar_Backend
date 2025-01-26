@@ -1,11 +1,20 @@
 import Midwife from '../models/Midwife.js';
 import transporter from '../config/db.js';
+import bcrypt from 'bcrypt';
 
 
 
+export const createMidwife = async (name, hospitalId, email, password) => {
 
-export const createMidwife = async (name, hospitalId, email) => {
-  const newMidwife = new Midwife({ name, hospital: hospitalId });
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  
+  const newMidwife = new Midwife({ 
+    name, 
+    hospital: hospitalId, 
+    password: hashedPassword 
+  });
+
   await newMidwife.save();
 
   // Ajout de la sage-femme à l'hôpital
@@ -13,19 +22,19 @@ export const createMidwife = async (name, hospitalId, email) => {
   hospital.midwives.push(newMidwife._id);
   await hospital.save();
 
-  
   const mailOptions = {
-      from: '',
-      to: email, 
-      subject: 'Confirmation de votre inscription en tant que sage-femme',
-      text: `Bonjour ${name},\n\nVotre inscription en tant que sage-femme a été réussie ! Voici vos informations de connexion :\n\nNom: ${name}\nHôpital: ${hospital.name}\n\nMerci de votre confiance !`,
+    from: '',
+    to: email, 
+    subject: 'Confirmation de la création de votre compte',
+    text: `Bonjour ${name},\n\nVotre inscription en tant que sage-femme a été réussie ! Voici vos informations de connexion :\n\nNom: ${name}\nHôpital: ${hospital.name}\n\n et votre mot de passe: ${password}\n\nMerci de votre confiance !`,
   };
+  console.log(mailOptions);
+  
 
   await transporter.sendMail(mailOptions);
 
   return newMidwife;
 };
-
 
 
 

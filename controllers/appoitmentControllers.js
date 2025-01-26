@@ -84,3 +84,44 @@ export const deleteAppointment = async (req, res) => {
         res.status(500).send(error);
     }
 };
+
+
+// Fonction pour confirmer le rendez-vous
+export const ConfirmAppointment = async (req, res) => {
+    try {
+        const { appointmentId, status } = req.body;
+
+        if (!appointmentId || !status) {
+            return res.status(400).send({ message: 'Tous les champs sont requis.' });
+        }
+
+        // Trouver la demande de rendez-vous
+        const appointment = await visitorAppointment.findById(appointmentId);
+        if (!appointment) {
+            return res.status(404).send({ message: 'Demande de rendez-vous non trouvée.' });
+        }
+
+        // Mettre à jour le statut de la demande
+        appointment.statut = status;
+        await appointment.save();
+
+       
+
+        const mailOptions = {
+            from: Hospital.email, // Votre adresse email
+            to: appointment.visitorRequest.email, // Email du visiteur
+            subject: 'Confirmation de votre rendez-vous',
+            text: `Bonjour ${appointment.visitorRequest.name},\n\nVotre demande de rendez-vous a été ${status}.\n\nMerci,\nL'équipe de l'hôpital.`,
+        };
+        console.log(mailOptions);
+        
+
+        // Envoi de l'email
+        await transporter.sendMail(mailOptions);
+
+        res.status(200).send({ message: 'Statut de la demande mis à jour avec succès et confirmation envoyée au visiteur.' });
+    } catch (error) {
+        res.status(500).send({ message: 'Erreur lors de la mise à jour de la demande.', error });
+    }
+};
+

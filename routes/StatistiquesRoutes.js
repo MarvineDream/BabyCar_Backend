@@ -1,10 +1,10 @@
 import express from 'express';
-import { getStatisticById, getStatistics } from '../controllers/statistiControllers.js';
+import { getStatisticById } from '../controllers/statistiControllers.js';
 
 
 const router = express.Router();
 
-router.get('/', getStatistics);
+//router.get('/', getStatistics);
 router.get('/:id', getStatisticById);
 
 

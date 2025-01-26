@@ -2,6 +2,7 @@ import Hospital from '../models/Hopital.js';
 import { body, validationResult } from 'express-validator';
 import dotenv from 'dotenv';
 import transporter from '../config/db.js';
+import bcrypt from 'bcrypt';
 
 
 
@@ -14,10 +15,12 @@ const validateHospital = [
     body('name').isString().notEmpty().withMessage('Le nom est requis.'),
     body('address').isString().notEmpty().withMessage('L\'adresse est requise.'),
     body('contact').isString().notEmpty().withMessage('Le contact est requis.'),
+    body('password').isString().notEmpty().withMessage('Le mot de passe est requis'),
     body('email').isString().notEmpty().withMessage('L\'email est requis.'),
     //body('latitude').isNumeric().notEmpty().withMessage('La latitude est requise.'),
     //body('longitude').isNumeric().notEmpty().withMessage('La longitude est requise.'),
 ];
+
 
 
 
@@ -48,14 +51,18 @@ const createHospital = async (req, res) => {
             });
         }
 
-        const hospital = new Hospital(req.body);
+        // Crypter le mot de passe
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        const hospitalData = { ...req.body, password: hashedPassword }; 
+
+        const hospital = new Hospital(hospitalData);
         await hospital.save();
 
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: req.body.email,
             subject: 'Confirmation de la création de l\'hôpital',
-            text: `L'hôpital ${hospital.name} a été créé avec succès !`,
+            text: `L'hôpital ${hospital.name} a été créé avec succès !\n\nVoici vos éléments de connexion :\nEmail : ${req.body.email}\nMot de passe : ${req.body.password}`,
         };
         console.log(mailOptions);
 
@@ -122,5 +129,7 @@ const deleteHospital = async (req, res) => {
 };
 
 
-export { 
-    createHospital, getHospitals, getHospitalById, updateHospital, deleteHospital, validateHospital };
+
+
+
+export { createHospital, getHospitals, getHospitalById, updateHospital, deleteHospital, validateHospital };
