@@ -1,16 +1,17 @@
 import bcrypt from 'bcrypt';
 import Admin from '../models/Admin.js';
 import { generateToken } from '../middleware/jwt.js';
+import mongoose from 'mongoose';
 
 
 
 
 
 export const register = async (req, res) => {
-    const { adminName, password, role } = req.body;
+    const { username, password, role } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newAdmin = new Admin({ adminName, password: hashedPassword, role });
+        const newAdmin = new Admin({ username, password: hashedPassword, role });
         await newAdmin.save();
         res.status(201).json(newAdmin);
     } catch (error) {
@@ -19,16 +20,29 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-    const { adminName, password } = req.body;
+    const { username, password } = req.body;
+    console.log(req.body);
+    
     try {
-        const admin = await Admin.findOne({ adminName });
-        if (admin && await bcrypt.compare(password, admin.password)) {
-            generateToken(admin._id);
-            res.status(200).json({ token, admin });
+        const admin = await Admin.findOne({ username });
+        if (admin) {
+            const isMatch = await bcrypt.compare(password, admin.password);
+            if (isMatch) {
+
+                if (!mongoose.Types.ObjectId.isValid(admin._id)) {
+                    return res.status(500).json({ message: 'ID d\'administrateur invalide' });
+                }
+                
+                const token = generateToken(admin._id);
+                res.status(200).json({ token, admin });
+            } else {
+                res.status(401).json({ message: 'Identifiants invalides' });
+            }
         } else {
             res.status(401).json({ message: 'Identifiants invalides' });
         }
     } catch (error) {
+        console.error(error); 
         res.status(500).json({ message: error.message });
     }
 };
