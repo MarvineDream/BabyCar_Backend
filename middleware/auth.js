@@ -12,6 +12,9 @@ const secret = process.env.JWT_SECRET;
 export const authenticate = (req, res, next) => {
     const token = req.headers.authorization;
 
+    console.log(token);
+    
+
     if (!token) {
         return res.status(401).send('Token is required');
     }
