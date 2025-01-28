@@ -86,13 +86,21 @@ export const deleteAppointment = async (req, res) => {
 };
 
 
+
 // Fonction pour confirmer le rendez-vous
 export const ConfirmAppointment = async (req, res) => {
     try {
         const { appointmentId, status } = req.body;
 
+        // Vérification des champs requis
         if (!appointmentId || !status) {
             return res.status(400).send({ message: 'Tous les champs sont requis.' });
+        }
+
+        // Vérification du statut
+        const validStatuses = ['confirmé', 'annulé']; 
+        if (!validStatuses.includes(status)) {
+            return res.status(400).send({ message: 'Statut invalide.' });
         }
 
         // Trouver la demande de rendez-vous
@@ -105,23 +113,19 @@ export const ConfirmAppointment = async (req, res) => {
         appointment.statut = status;
         await appointment.save();
 
-       
-
         const mailOptions = {
-            from: Hospital.email, // Votre adresse email
-            to: appointment.visitorRequest.email, // Email du visiteur
+            from: Hospital.email,
+            to: appointment.visitorRequest.email,
             subject: 'Confirmation de votre rendez-vous',
             text: `Bonjour ${appointment.visitorRequest.name},\n\nVotre demande de rendez-vous a été ${status}.\n\nMerci,\nL'équipe de l'hôpital.`,
         };
-        console.log(mailOptions);
-        
 
         // Envoi de l'email
         await transporter.sendMail(mailOptions);
 
         res.status(200).send({ message: 'Statut de la demande mis à jour avec succès et confirmation envoyée au visiteur.' });
     } catch (error) {
+        console.error('Erreur lors de la mise à jour de la demande:', error); 
         res.status(500).send({ message: 'Erreur lors de la mise à jour de la demande.', error });
     }
 };
-

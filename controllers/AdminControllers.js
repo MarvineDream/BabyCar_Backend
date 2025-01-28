@@ -1,51 +1,36 @@
 import bcrypt from 'bcrypt';
 import Admin from '../models/Admin.js';
-import { generateToken } from '../middleware/jwt.js';
-import mongoose from 'mongoose';
+
+
 
 
 
 
 
 export const register = async (req, res) => {
-    const { username, password, role } = req.body;
+    const { username, password, role } = req.body; 
     try {
+        // Hachage du mot de passe
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newAdmin = new Admin({ username, password: hashedPassword, role });
+
+        // Création d'un nouvel administrateur
+        const newAdmin = new Admin({
+            username, // Assurez-vous que ce champ est présent
+            password: hashedPassword,
+            role,
+        });
+
+        // Sauvegarde dans la base de données
         await newAdmin.save();
+
+        // Réponse avec l'administrateur créé
         res.status(201).json(newAdmin);
     } catch (error) {
+        // Gestion des erreurs
         res.status(500).json({ message: error.message });
     }
 };
 
-export const login = async (req, res) => {
-    const { username, password } = req.body;
-    console.log(req.body);
-    
-    try {
-        const admin = await Admin.findOne({ username });
-        if (admin) {
-            const isMatch = await bcrypt.compare(password, admin.password);
-            if (isMatch) {
-
-                if (!mongoose.Types.ObjectId.isValid(admin._id)) {
-                    return res.status(500).json({ message: 'ID d\'administrateur invalide' });
-                }
-                
-                const token = generateToken(admin._id);
-                res.status(200).json({ token, admin });
-            } else {
-                res.status(401).json({ message: 'Identifiants invalides' });
-            }
-        } else {
-            res.status(401).json({ message: 'Identifiants invalides' });
-        }
-    } catch (error) {
-        console.error(error); 
-        res.status(500).json({ message: error.message });
-    }
-};
 
 
 export const getAllAdmins = async (req, res) => {
@@ -61,11 +46,11 @@ export const getAllAdmins = async (req, res) => {
 export const getAdminById = async (req, res) => {
     const { id } = req.params;
     try {
-        const admin = await Admin.findById(id);
-        if (!admin) {
+        const admins = await Admin.findById(id);
+        if (!admins) {
             return res.status(404).json({ message: 'Administrateur non trouvé' });
         }
-        res.status(200).json(admin);
+        res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -74,14 +59,14 @@ export const getAdminById = async (req, res) => {
 // Mettre à jour un administrateur
 export const updateAdmin = async (req, res) => {
     const { id } = req.params;
-    const { adminName, password, role } = req.body;
+    const { username, password, role } = req.body;
 
     try {
         const hashedPassword = password ? await bcrypt.hash(password, 10) : undefined;
 
-        const updatedAdmin = await Admin.findByIdAndUpdate(
+        const updatedAdmin = await User.findByIdAndUpdate(
             id,
-            { adminName, password: hashedPassword, role },
+            { username, password: hashedPassword, role },
             { new: true }
         );
 
@@ -101,9 +86,9 @@ export const deleteAdmin = async (req, res) => {
     try {
         const deletedAdmin = await Admin.findByIdAndDelete(id);
         if (!deletedAdmin) {
-            return res.status(404).json({ message: 'Administrateur non trouvé' });
+            return res.status(404).json({ message: 'Utilisateur non trouvé' });
         }
-        res.status(200).json({ message: 'Administrateur supprimé avec succès' });
+        res.status(200).json({ message: 'Utilisateur supprimé avec succès' });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
