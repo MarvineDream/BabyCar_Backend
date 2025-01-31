@@ -22,10 +22,10 @@ const validateHospital = [
     body('name').isString().notEmpty().withMessage('Le nom est requis.'),
     body('address').isString().notEmpty().withMessage('L\'adresse est requise.'),
     body('contact').isString().notEmpty().withMessage('Le contact est requis.'),
-    body('password').isString().notEmpty().withMessage('Le mot de passe est requis'),
-    body('email').isString().notEmpty().withMessage('L\'email est requis.'),
+    body('password').isString().notEmpty().withMessage('Le mot de passe est requis.'),
+    body('email').isEmail().withMessage('L\'email doit être valide.').notEmpty().withMessage('L\'email est requis.'),
+    body('phone').isString().notEmpty().withMessage('Le numéro de téléphone est requis.'),
 ];
-
 
 const createHospital = async (req, res) => {
     const errors = validationResult(req);
@@ -44,11 +44,11 @@ const createHospital = async (req, res) => {
             ]
         });
 
-        if (existingHospital) {
+        /*if (existingHospital) {
             return res.status(400).json({ 
                 message: 'Un hôpital avec cette adresse e-mail ou ce numéro de téléphone existe déjà.' 
             });
-        }
+        } */
 
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const hospitalData = { ...req.body, password: hashedPassword }; 
@@ -62,18 +62,18 @@ const createHospital = async (req, res) => {
             from: process.env.EMAIL_USER,
             to: req.body.email,
             subject: 'Confirmation de la création de l\'hôpital',
-            text: `L'hôpital ${hospital.name} a été créé avec succès\n\nVoici vos éléments de connexion:\nEmail:${req.body.email}\nMot de passe:${req.body.password}`,
+            text: `L'hôpital ${hospital.name} a été créé avec succès.\n\nVoici vos éléments de connexion:\nEmail: ${req.body.email}\nMot de passe: ${req.body.password}`,
         };
-        console.log(mailOptions);
 
+        // Envoi de l'email
         await transporter.sendMail(mailOptions);
 
         res.status(201).json({ hospital, token }); // Renvoie l'hôpital et le token
     } catch (error) {
+        console.error('Erreur lors de la création de l\'hôpital:', error); // Journalisation de l'erreur
         res.status(500).json({ message: 'Erreur lors de la création de l\'hôpital.', error: error.message });
     }
 };
-
 
 
 // Fonction de connexion pour générer un token
