@@ -5,10 +5,13 @@ import Appointment from '../models/Appoitment.js';
 
 export const createAppointment = async (req, res) => {
     try {
-        
-        const midwifeId = req.body.midwife; 
+        const { midwife: midwifeId, patient, date } = req.body; 
 
-        
+        // Vérifiez si les champs requis sont fournis
+        if (!midwifeId || !patient || !date) {
+            return res.status(400).send({ message: 'Tous les champs sont requis.' });
+        }
+
         const midwife = await midwife.findById(midwifeId);
         
         if (!midwife) {
@@ -18,28 +21,37 @@ export const createAppointment = async (req, res) => {
         // Créez le rendez-vous
         const appointment = new Appointment({
             midwife: midwifeId,
-            patient: req.body.patient,
-            date: req.body.date,
+            patient,
+            date,
         });
 
         await appointment.save();
         res.status(201).send(appointment);
     } catch (error) {
-        res.status(500).send(error);
+        console.error('Erreur lors de la création du rendez-vous:', error);
+        res.status(500).send({ message: 'Erreur lors de la création du rendez-vous.', error });
     }
 };
-
 
 export const getAppointments = async (req, res) => {
     try {
+        // Récupération des rendez-vous avec les informations de la sage-femme et du patient
         const appointments = await Appointment.find()
-            .populate('midwife')
-            .populate('patient');
-        res.send(appointments);
+            .populate('midwife', 'name email') 
+            .populate('patiente', 'name email');
+
+        if (!appointments.length) {
+            return res.status(404).send({ message: 'Aucun rendez-vous trouvé.' });
+        }
+
+        res.status(200).send(appointments);
     } catch (error) {
-        res.status(500).send(error);
+        console.error('Erreur lors de la récupération des rendez-vous:', error);
+        res.status(500).send({ message: 'Erreur lors de la récupération des rendez-vous.', error });
     }
 };
+
+
 
 export const getAppointmentById = async (req, res) => {
     try {
@@ -103,13 +115,11 @@ export const ConfirmAppointment = async (req, res) => {
             return res.status(400).send({ message: 'Statut invalide.' });
         }
 
-        // Trouver la demande de rendez-vous
         const appointment = await visitorAppointment.findById(appointmentId);
         if (!appointment) {
             return res.status(404).send({ message: 'Demande de rendez-vous non trouvée.' });
         }
 
-        // Mettre à jour le statut de la demande
         appointment.statut = status;
         await appointment.save();
 

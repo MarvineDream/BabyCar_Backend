@@ -1,10 +1,11 @@
 import express from 'express';
-import { rechercherElements } from '../controllers/rechercheControllers.js';
+import { recherche } from '../controllers/rechercheControllers.js';
+
 
 
 const router = express.Router();
 
 
-router.get('/', rechercherElements);
+router.get('/', recherche);
 
 export default router;

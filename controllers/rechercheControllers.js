@@ -1,30 +1,25 @@
 import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
 
-
-
-
-
 dotenv.config();
 
-
-
-
-export const rechercherElements = async (req, res) => {
-    const client = new MongoClient('mongodb+srv://leskalpel:universitees123@marvinecluster2.ppo9r.mongodb.net', {
+export const recherche = async (req, res) => {
+    const client = new MongoClient(process.env.MONGODB_URI, {
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 45000
     });
-    const { query } = req.query; 
-    console.log(req.query);
-    
+
+    const { query } = req.query;
+
+    if (!query || (!query.nom && !query.description)) {
+        return res.status(400).send("Requête invalide : 'nom' ou 'description' requis.");
+    }
 
     try {
         await client.connect();
         const db = client.db('BabyCarDB');
         const collections = await db.listCollections().toArray();
         let results = [];
-        
 
         for (const collection of collections) {
             const collectionName = collection.name;
@@ -50,6 +45,3 @@ export const rechercherElements = async (req, res) => {
         await client.close();
     }
 };
-
-
-

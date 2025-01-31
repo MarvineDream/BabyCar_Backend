@@ -10,20 +10,19 @@ import Admin from '../models/Admin.js';
 export const register = async (req, res) => {
     const { username, password, role } = req.body; 
     try {
-        // Hachage du mot de passe
+        
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Création d'un nouvel administrateur
         const newAdmin = new Admin({
-            username, // Assurez-vous que ce champ est présent
+            username, 
             password: hashedPassword,
             role,
         });
 
-        // Sauvegarde dans la base de données
+        
         await newAdmin.save();
 
-        // Réponse avec l'administrateur créé
         res.status(201).json(newAdmin);
     } catch (error) {
         // Gestion des erreurs

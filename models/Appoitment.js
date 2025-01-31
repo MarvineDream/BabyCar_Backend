@@ -5,7 +5,7 @@ const appointmentSchema = new mongoose.Schema({
     statut: { type: String, enum: ['en attente', 'confirmé', 'terminé'], required: true },
     type: { type: String, enum: ['confirmé', 'annulé', 'terminé'], required: true },
     midwife: { type: mongoose.Schema.Types.ObjectId, ref: 'Midwife', required: true },
-    patient: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient', required: true },
+    patiente: { type: mongoose.Schema.Types.ObjectId, ref: 'Patiente', required: true },
 },
 { timestamps: true });
 
