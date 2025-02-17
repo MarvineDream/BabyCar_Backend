@@ -6,7 +6,8 @@ const adminSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: { type: String, enum: ['root', 'hospitalAdmin', 'midwife', 'patientes'], required: true },
     hospital: { type: mongoose.Schema.Types.ObjectId, ref: 'Hospital'},
-});
+},
+{ timestamps: true });
 
 adminSchema.pre('save', async function(next) {
     if (this.isModified('password')) {
