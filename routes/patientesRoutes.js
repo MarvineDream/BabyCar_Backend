@@ -1,9 +1,13 @@
 import express from 'express';
-import { createPatient, deletePatient, getPatientById, getPatients, updatePatient } from '../controllers/patientesControllers.js';
+import { createPatient, deletePatient, getPatientById, getPatients, loginPatient, updatePatient } from '../controllers/patientesControllers.js';
 import { authenticate } from '../middleware/auth.js';
 
 const router = express.Router();
 
+
+
+
+router.post('/Login', loginPatient);
 
 // Route pour créer un patient : accessible aux sages-femmes
 router.post('/:midwifeId', createPatient);

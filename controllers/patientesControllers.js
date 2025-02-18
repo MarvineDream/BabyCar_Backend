@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import transporter from '../config/db.js';
 import bcrypt from 'bcrypt';
 import { generateToken } from './hospitalControllers.js';
+import Patiente from '../models/Patientes.js';
 
 
 dotenv.config();
@@ -25,6 +26,7 @@ export const createPatient = async (req, res) => {
             statut, 
             prochain_rendez_vous 
         } = req.body;
+        
 
         // Vérification des champs requis
         if (!nom || !prenom || !age || !password || !numero_de_telephone || !email || !semaine_grossesse || !statut || !prochain_rendez_vous) {
@@ -66,31 +68,36 @@ export const createPatient = async (req, res) => {
 };
 
 
-
-
-const loginPatient = async (req, res) => {
+export const loginPatient = async (req, res) => {
     const { email, password } = req.body;
+    console.log(req.body);
+
+    // Vérification des données d'entrée
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email et mot de passe sont requis.' });
+    }
 
     try {
-        const hospital = await hospital.findOne({ email });
-        if (!hospital) {
-            return res.status(404).json({ message: 'Hôpital non trouvé.' });
+        // Recherche de la patiente par email
+        const patient = await Patientes.findOne({ email }); 
+        if (!patient) {
+            return res.status(404).json({ message: 'Patiente non trouvée.' });
         }
 
-        const isMatch = await bcrypt.compare(password, hospital.password);
+        // Vérification du mot de passe
+        const isMatch = await bcrypt.compare(password, patient.password); 
         if (!isMatch) {
             return res.status(401).json({ message: 'Mot de passe incorrect.' });
         }
 
-        generateToken(hospital); 
-        res.json({ hospital, token }); 
+        // Génération du token
+        const token = generateToken(patient); 
+        res.json({ patient, token }); 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Erreur lors de la connexion du patient:', error);
+        res.status(500).json({ message: 'Erreur interne du serveur. Veuillez réessayer plus tard.' });
     }
 };
-
-export { loginPatient };
-
 
 
 
