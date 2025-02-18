@@ -56,7 +56,7 @@ export const createPatient = async (req, res) => {
             from: process.env.EMAIL_USER,
             to: email, 
             subject: 'Confirmation de votre inscription',
-            text: `Bonjour ${prenom} ${nom},\n\nVotre inscription a été réussie ! Voici vos informations de connexion :\n\nNom: ${nom}\nPrénom: ${prenom}\nEmail: ${email}\nNuméro de téléphone: ${numero_de_telephone}\nEt votre mot de passe: ${password}\n\nMerci de votre confiance !`,
+            text: `Bonjour ${prenom} ${nom},\n\nVotre inscription a été réussie ! Voici vos informations de connexion :\n\nNom: ${nom}\nPrénom: ${prenom}\nEmail: ${email}\nNuméro de téléphone: ${numero_de_telephone}\nEt votre mot de passe: ${password}\n\nBienvenue parmi nous !`,
         };
 
         await transporter.sendMail(mailOptions);
