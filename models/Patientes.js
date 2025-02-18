@@ -10,8 +10,12 @@ const patienteSchema = new mongoose.Schema({
     semaine_grossesse: { type: Number, required: true },
     statut: { type: String, enum: ['suivi régulier', 'complication'], required: true },
     prochain_rendez_vous: { type: Date, required: true },
-    midwives: [{ type: mongoose.Schema.Types.ObjectId, ref: 'midwives' }] 
+    midwives: [{ type: mongoose.Schema.Types.ObjectId, ref: 'midwives' }],
+    role: { type: String, default: 'Patiente'},
+
 },
 { timestamps: true });
 
-export default mongoose.model('Patiente', patienteSchema);
+const Patiente = mongoose.model('Patiente', patienteSchema);
+
+export default Patiente;

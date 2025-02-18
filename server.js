@@ -8,7 +8,8 @@ import midwifeRoutes from './routes/midwifeRoutes.js';
 import patientesRoutes from './routes/patientesRoutes.js';
 import appointmentRoutes from './routes/AppoitmentRoutes.js';
 import consultationRoutes from './routes/consultationRoutes.js';
-import taskRoutes from './routes/taskRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import taskRoutes from './routes/TacheRoutes.js';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import rechercheRoutes from './routes/rechercheRoutes.js';
@@ -59,6 +60,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/Authentification', authentificationRoutes);
+app.use('/Admin', adminRoutes);
 app.use('/hospitals', hospitalRoutes);
 app.use('/Sage_femmes', midwifeRoutes);
 app.use('/patientes', patientesRoutes);

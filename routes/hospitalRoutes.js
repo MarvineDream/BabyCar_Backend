@@ -6,10 +6,10 @@ import { authenticate, authorize } from '../middleware/auth.js';
 const router = express.Router();
 
 // Route pour créer un hôpital : accessible uniquement à l'admin de l'hôpital
-router.post('/', createHospital);
+router.post('/', authenticate, authorize(['hospitals', 'hospitalAdmin']), createHospital);
 
 // Route pour récupérer tous les hôpitaux : accessible uniquement à l'admin root
-router.get('/', getHospitals);
+router.get('/', authenticate, authorize(['root']), getHospitals);
 
 // Route pour récupérer un hôpital par son ID : accessible uniquement à l'admin root
 router.get('/:id', authenticate, authorize(['root']), getHospitalById);

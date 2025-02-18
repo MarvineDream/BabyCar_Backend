@@ -1,6 +1,6 @@
 import express from 'express';
-import { login } from '../middleware/auth.js';
-import { register } from '../controllers/AdminControllers.js';
+//import { login } from '../middleware/auth.js';
+//import { register } from '../controllers/adminControllers.js';
 
 
 
@@ -12,10 +12,10 @@ const router = express.Router();
 
 
 // Route pour se connecter
-router.post('/Login', login);
+//router.post('/Login', login);
 
 // Route pour créer un utilisateur ( admin )
-router.post('/Register', register);
+//router.post('/Register', register);
 
 
 
