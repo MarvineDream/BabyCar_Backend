@@ -1,11 +1,14 @@
 import express from 'express';
-import { deleteAdmin, getAdminById, getAllAdmins, updateAdmin } from '../controllers/AdminControllers.js';
+import { deleteAdmin, getAdminById, getAllAdmins, login, register, updateAdmin } from '../controllers/AdminControllers.js';
 
 
 const router = express.Router();
 
 
 
+router.post('/Register', register);
+
+router.post('/Login', login);
 
 // Route pour récupérer tous les admins
 router.get('/', getAllAdmins);

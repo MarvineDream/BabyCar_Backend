@@ -79,6 +79,8 @@ const createHospital = async (req, res) => {
 // Fonction de connexion pour générer un token
 const loginHospital = async (req, res) => {
     const { email, password } = req.body;
+    console.log(req.body);
+    
 
     try {
         const hospital = await Hospital.findOne({ email });

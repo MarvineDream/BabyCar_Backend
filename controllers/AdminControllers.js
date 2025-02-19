@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 
 
 
-
 export const register = async (req, res) => {
     const { username, password, email, role, hospital } = req.body; 
     console.log(req.body);
@@ -89,7 +88,6 @@ export const login = async (req, res) => {
 };
 
 
-
 export const getAllAdmins = async (req, res) => {
     try {
         const admins = await Admin.find();
@@ -136,6 +134,7 @@ export const updateAdmin = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 
 // Supprimer un administrateur
 export const deleteAdmin = async (req, res) => {
