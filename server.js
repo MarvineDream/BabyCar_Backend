@@ -9,7 +9,7 @@ import patientesRoutes from './routes/patientesRoutes.js';
 import appointmentRoutes from './routes/AppoitmentRoutes.js';
 import consultationRoutes from './routes/consultationRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
-import taskRoutes from './routes/TacheRoutes.js';
+import taskRoutes from './routes/taskRoutes.js';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import rechercheRoutes from './routes/rechercheRoutes.js';

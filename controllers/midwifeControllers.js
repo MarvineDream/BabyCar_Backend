@@ -13,11 +13,6 @@ export const createMidwife = async (name, hospitalId, email, password) => {
     throw new Error('Tous les champs sont requis.');
   }
 
-  // Vérification du format de l'email
-  //if (!validateEmail(email)) {
-    //throw new Error('Format de l\'email invalide.');
-  //}
-
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const newMidwife = new Midwife({ 

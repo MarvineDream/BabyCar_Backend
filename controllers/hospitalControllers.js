@@ -44,11 +44,11 @@ const createHospital = async (req, res) => {
             ]
         });
 
-        /*if (existingHospital) {
+        if (existingHospital) {
             return res.status(400).json({ 
                 message: 'Un hôpital avec cette adresse e-mail ou ce numéro de téléphone existe déjà.' 
             });
-        } */
+        } 
 
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const hospitalData = { ...req.body, password: hashedPassword }; 
