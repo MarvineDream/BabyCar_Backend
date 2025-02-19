@@ -2,7 +2,7 @@ import Midwife from '../models/Midwife.js';
 import Hospital from '../models/Hopital.js';
 import transporter from '../config/db.js';
 import bcrypt from 'bcrypt';
-import { validateEmail } from '../middleware/auth.js';
+
 
 
 

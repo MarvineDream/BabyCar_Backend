@@ -4,29 +4,27 @@ import transporter from '../config/db.js';
 
 export const VisitorAppointment = async (req, res) => {
     try {
-        const { hospitalId, date, visitorName, visitorContact, visitorMail, motif } = req.body;
+        const { hopital, date, name, contact, email, motif } = req.body;
 
         // Vérification des champs requis
-        if (!hospitalId || !date || !visitorName || !visitorContact || !visitorMail || !motif) {
+        if (!hopital || !date || !name || !contact || !email || !motif) {
             return res.status(400).send({ message: 'Tous les champs sont requis.' });
         }
 
         // Récupérer l'hôpital par son ID
-        const hospital = await Hopital.findById(hospitalId);
+        const hospital = await Hopital.findById(hopital);
         if (!hospital) {
             return res.status(404).send({ message: 'Hôpital non trouvé.' });
         }
 
         // Création de la demande de rendez-vous
         const visitorAppointment = new Visitor({
-            hospital: hospitalId,
-            visitorRequest: {
-                name: visitorName,
-                contact: visitorContact,
-                email: visitorMail,
-                motif: motif,  // Ajout du motif
-            },
-            date,
+            hopital: hopital, 
+            name: name,
+            contact: contact,
+            email: email,
+            motif: motif,
+            date: date,
             statut: 'en attente',
         });
 
@@ -34,10 +32,10 @@ export const VisitorAppointment = async (req, res) => {
 
         // Options de l'email
         const mailOptions = {
-            from: visitorMail,
+            from: email,
             to: hospital.email,
             subject: 'Demande de rendez-vous',
-            text: `Vous avez reçu une nouvelle demande de rendez-vous de ${visitorName}.\n\nDétails:\nDate: ${date}\nContact: ${visitorContact}\nEmail: ${visitorMail}\nMotif: ${motif}\nStatut: en attente`,
+            text: `Vous avez reçu une nouvelle demande de rendez-vous de ${name}.\n\nDétails:\nDate: ${date}\nContact: ${contact}\nEmail: ${email}\nMotif: ${motif}\nStatut: en attente`,
         };
 
         await transporter.sendMail(mailOptions);
