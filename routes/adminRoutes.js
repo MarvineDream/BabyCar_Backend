@@ -12,7 +12,7 @@ router.get('/', getAllAdmins);
 
 router.post('/Register', register);
 
-router.post('/', login);
+router.post('/Login', login);
 
 // Route pour récupérer un admin par ID
 router.get('/:id',  getAdminById);

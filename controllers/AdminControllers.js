@@ -1,13 +1,14 @@
 import bcrypt from 'bcrypt';
 import Admin from '../models/Admin.js';
-import Patientes from '../models/Patientes.js';
-import Midwife from '../models/Midwife.js';
+import jwt from 'jsonwebtoken';
 
 
 
 
 export const register = async (req, res) => {
-    const { username, password, email, role } = req.body; 
+    const { username, password, email, role, hospital } = req.body; 
+    console.log(req.body);
+    
 
     // Validation des données
     if (!email || !username || !password || !role) {
@@ -29,6 +30,7 @@ export const register = async (req, res) => {
             password: hashedPassword,
             email, 
             role,
+            hospital, 
         });
 
         await newAdmin.save();
@@ -45,61 +47,44 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
     const { email, password } = req.body;
+    console.log(req.body);
 
     // Validation des données
     if (!email || !password) {
-        return res.status(400).json({ message: 'Email et mot de passe requis' });
+        return res.status(400).json({ message: 'Email et mot de passe sont requis.' });
     }
 
     try {
-        let user;
-
-        // Recherche dans les différentes collections
-        user = await Admin.findOne({ email }) ||
-               await Midwife.findOne({ email }) ||
-               await Patientes.findOne({ email });
-
-        // Vérification de l'existence de l'utilisateur
-        if (!user) {
-            return res.status(401).json({ message: 'Identifiants invalides' });
+        // Vérifiez si l'administrateur existe
+        const admin = await Admin.findOne({ email });
+        if (!admin) {
+            return res.status(401).json({ message: 'Email ou mot de passe incorrect.' });
         }
 
-        // Vérification du mot de passe
-        const isMatch = await bcrypt.compare(password, user.password);
+        // Vérifiez le mot de passe
+        const isMatch = await bcrypt.compare(password, admin.password);
+        console.log(`Comparaison du mot de passe pour ${email}: ${isMatch}`);
         if (!isMatch) {
-            return res.status(401).json({ message: 'Identifiants invalides' });
+            return res.status(401).json({ message: 'Email ou mot de passe incorrect.' });
         }
 
-        // Vérification de l'ID de l'utilisateur
-        if (!mongoose.Types.ObjectId.isValid(user._id)) {
-            return res.status(500).json({ message: 'ID d\'utilisateur invalide' });
-        }
+        // Créez un jeton JWT
+        const token = jwt.sign({ id: admin._id, role: admin.role }, process.env.JWT_SECRET, {
+            expiresIn: '1h',
+        });
 
-        // Génération du token
-        const token = generateToken(user._id, user.role);
-
-        // Redirection en fonction du rôle
-        let redirectUrl;
-        switch (user.role) {
-            case 'root':
-            case 'admin':
-                redirectUrl = '/admin/dashboard';
-                break;
-            case 'midwife':
-                redirectUrl = '/midwife/dashboard';
-                break;
-            case 'Patiente':
-                redirectUrl = '/patiente/dashboard';
-                break;
-            default:
-                return res.status(403).json({ message: 'Rôle non reconnu' });
-        }
-
-        // Réponse avec le token et l'URL de redirection
-        res.status(200).json({ token, user, redirectUrl });
+        res.status(200).json({
+            token,
+            admin: {
+                username: admin.username,
+                email: admin.email,
+                role: admin.role,
+                hospital: admin.hospital
+            }
+        });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Erreur interne du serveur' });
+        console.error("Erreur lors de la connexion:", error);
+        res.status(500).json({ message: error.message });
     }
 };
 
